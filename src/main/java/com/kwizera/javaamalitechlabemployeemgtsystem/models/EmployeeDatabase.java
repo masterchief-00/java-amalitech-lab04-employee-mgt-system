@@ -1,9 +1,6 @@
 package com.kwizera.javaamalitechlabemployeemgtsystem.models;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class EmployeeDatabase<T> {
@@ -86,6 +83,24 @@ public class EmployeeDatabase<T> {
                 .values()
                 .stream()
                 .filter(e -> e.getPerformanceRating() >= minRating)
+                .collect(Collectors.toList());
+    }
+
+    // supposed to be EmployeeSalaryComparator
+    public List<Employee<T>> sortBySalary() {
+        return employeeMap
+                .values()
+                .stream()
+                .sorted(Comparator.comparingDouble(Employee::getSalary))
+                .collect(Collectors.toList());
+    }
+
+    // supposed to be EmployeePerformanceComparator
+    public List<Employee<T>> sortByPerformance() {
+        return employeeMap
+                .values()
+                .stream()
+                .sorted(Comparator.comparingDouble(Employee::getPerformanceRating))
                 .collect(Collectors.toList());
     }
 }
