@@ -95,12 +95,43 @@ public class EmployeeDatabase<T> {
                 .collect(Collectors.toList());
     }
 
-    // supposed to be EmployeePerformanceComparator
+    // supposed to be EmployeePerformanceComparator [currently in ascending order, needs to be reversed]
     public List<Employee<T>> sortByPerformance() {
         return employeeMap
                 .values()
                 .stream()
                 .sorted(Comparator.comparingDouble(Employee::getPerformanceRating))
+                .collect(Collectors.toList());
+    }
+
+    public void giveRaiseToTopPerformers(double thresholdScore, double raiseRate) {
+        employeeMap
+                .values()
+                .stream()
+                .filter(e -> e.getPerformanceRating() >= thresholdScore)
+                .forEach(e -> {
+                    double newSalary = e.getSalary() * (1 + raiseRate / 100);
+                    e.setSalary(newSalary);
+                });
+    }
+
+    public double calculateAverageSalaryByDepartment(String department) {
+        return employeeMap
+                .values()
+                .stream()
+                .filter(e -> e.getDepartment().equalsIgnoreCase(department))
+                .mapToDouble(Employee::getSalary)
+                .average()
+                .orElse(0.0);
+    }
+
+    // [currently in ascending order, needs to be reversed]
+    public List<Employee<T>> getTopEarners(Integer N) {
+        return employeeMap
+                .values()
+                .stream()
+                .sorted(Comparator.comparingDouble(Employee::getSalary))
+                .limit(N)
                 .collect(Collectors.toList());
     }
 }
