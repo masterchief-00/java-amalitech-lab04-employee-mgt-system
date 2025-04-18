@@ -1,17 +1,27 @@
 package com.kwizera.javaamalitechlabemployeemgtsystem.models;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class EmployeeDatabase<T> {
     private Map<T, Employee<T>> employeeMap;
+    private ObservableList<Employee<T>> employeesList = FXCollections.observableArrayList();
 
-    EmployeeDatabase() {
+    public EmployeeDatabase() {
         this.employeeMap = new HashMap<>();
     }
 
-    public void addEmployee(Employee<T> employee) {
-        employeeMap.put(employee.getEmployeeId(), employee);
+    public boolean addEmployee(Employee<T> employee) {
+        if (!employeeMap.containsKey(employee.getEmployeeId())) {
+            employeeMap.put(employee.getEmployeeId(), employee);
+            employeesList.add(employee);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void removeEmployee(T employeeId) {
@@ -50,9 +60,8 @@ public class EmployeeDatabase<T> {
         }
     }
 
-    public List<Employee<T>> getAllEmployees() {
-        List<Employee<T>> allEmployees = new ArrayList<>();
-        return allEmployees;
+    public ObservableList<Employee<T>> getAllEmployees() {
+        return employeesList;
     }
 
     public List<Employee<T>> getEmployeesByDepartment(String department) {

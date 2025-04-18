@@ -92,8 +92,10 @@
                 <padding>
                     <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                 </padding>
-                <Button fx:id="submitEmployeeBtn" mnemonicParsing="false" text="Add employee"/>
-                <Button fx:id="cancelBtn" layoutX="20.0" layoutY="28.0" mnemonicParsing="false" text="Cancel"/>
+                <Button fx:id="submitEmployeeBtn" mnemonicParsing="false" text="Add employee"
+                        onAction="#onConfirmClicked"/>
+                <Button fx:id="cancelBtn" layoutX="20.0" layoutY="28.0" mnemonicParsing="false" text="Cancel"
+                        onAction="#onCancelClicked"/>
             </HBox>
         </AnchorPane>
     </SplitPane>

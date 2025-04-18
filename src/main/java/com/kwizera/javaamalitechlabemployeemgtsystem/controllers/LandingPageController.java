@@ -1,11 +1,14 @@
 package com.kwizera.javaamalitechlabemployeemgtsystem.controllers;
 
+import com.kwizera.javaamalitechlabemployeemgtsystem.models.EmployeeDatabase;
+import com.kwizera.javaamalitechlabemployeemgtsystem.session.SessionManager;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.Util;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
 import java.io.IOException;
+import java.util.UUID;
 
 public class LandingPageController {
     Util util = new Util();
@@ -28,6 +31,8 @@ public class LandingPageController {
 
     @FXML
     private void initialize() {
-
+        EmployeeDatabase<UUID> db = new EmployeeDatabase<>();
+        SessionManager<UUID> session = SessionManager.getInstance();
+        session.setDatabase(db);
     }
 }
