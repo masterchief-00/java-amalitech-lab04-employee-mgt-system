@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+
+<AnchorPane prefHeight="441.0" prefWidth="828.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.kwizera.javaamalitechlabemployeemgtsystem.controllers.MainPageController">
+    <SplitPane dividerPositions="0.3240651965484181" layoutX="-2.0" prefHeight="441.0" prefWidth="828.0">
+        <AnchorPane fx:id="employeeDetailsPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <Label fx:id="noEmployeeLabel" layoutX="52.0" layoutY="14.0" text="No employee selected" />
+        </AnchorPane>
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+            <SplitPane dividerPositions="0.1633587786259542" orientation="VERTICAL" prefHeight="439.0" prefWidth="555.0">
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                    <HBox alignment="CENTER_LEFT" prefHeight="68.0" prefWidth="465.0" spacing="10.0">
+                        <padding>
+                            <Insets bottom="5.0" left="10.0" right="10.0" top="5.0" />
+                        </padding>
+                        <TextField fx:id="searchInput" promptText="Search by name" />
+                        <ComboBox fx:id="sortCombo" prefWidth="150.0" promptText="Sort by:" />
+                        <ComboBox fx:id="filterCombo" prefWidth="150.0" promptText="Filter by:" />
+                    </HBox>
+               <Button fx:id="addNewBtn" layoutX="465.0" layoutY="21.0" mnemonicParsing="false" onAction="#onAddNewClicked" text="Add new" />
+                </AnchorPane>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="362.0" prefWidth="549.0">
+                    <TableView fx:id="employeeTable" prefHeight="362.0" prefWidth="555.0" style="-fx-alignment: CENTER; -fx-font-size: 13;">
+                        <columns>
+                            <TableColumn fx:id="nameCol" prefWidth="100.66668450832367" style="-fx-alignment: CENTER;" text="Name" />
+                            <TableColumn fx:id="departmentCol" prefWidth="128.00006866455078" style="-fx-alignment: CENTER;" text="Department" />
+                            <TableColumn fx:id="salaryCol" prefWidth="83.33332824707031" style="-fx-alignment: CENTER;" text="Salary (RWF)" />
+                            <TableColumn fx:id="ratingCol" prefWidth="70.6666259765625" style="-fx-alignment: CENTER;" text="Rating" />
+                            <TableColumn fx:id="experienceCol" prefWidth="92.666748046875" style="-fx-alignment: CENTER;" text="Experience" />
+                            <TableColumn fx:id="statusCol" prefWidth="82.66665649414062" style="-fx-alignment: CENTER;" text="Status" />
+                        </columns>
+                  <cursor>
+                     <Cursor fx:constant="OPEN_HAND" />
+                  </cursor>
+                    </TableView>
+                </AnchorPane>
+            </SplitPane>
+        </AnchorPane>
+    </SplitPane>
+</AnchorPane>
