@@ -18,7 +18,7 @@ public class LandingPageController {
 
     @FXML
     private void onStartClicked() throws IOException {
-        util.switchScene("/com/kwizera/javaamalitechlabemployeemgtsystem/main_page.xml", startBtn, "EMS | Home");
+        util.switchScene("/com/kwizera/javaamalitechlabemployeemgtsystem/main_page.fxml", startBtn, "EMS | Home");
     }
 
     @FXML
