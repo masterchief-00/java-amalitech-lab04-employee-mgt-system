@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 
@@ -15,12 +16,28 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class Util {
+
+    public void displayModularScene(String fxmlFile, Button sourceButton, String title) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
+        Parent root = loader.load();
+
+        Stage stage = new Stage();
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+        stage.initModality(Modality.WINDOW_MODAL);
+        stage.initOwner((Stage) sourceButton.getScene().getWindow());
+
+        stage.setResizable(false);
+        stage.show();
+    }
+
     public void switchScene(String fxmlFile, Button sourceButton, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();
         Stage stage = (Stage) sourceButton.getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.setTitle(title);
+        stage.setResizable(false);
         stage.show();
     }
 

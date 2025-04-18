@@ -1,5 +1,6 @@
 package com.kwizera.javaamalitechlabemployeemgtsystem.controllers;
 
+import com.kwizera.javaamalitechlabemployeemgtsystem.models.Employee;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.Util;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -8,16 +9,30 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.util.Pair;
 
+import java.io.IOException;
 import java.util.Optional;
 
 public class MainPageController {
+
+
     Util util = new Util();
+
+    @FXML
+    public Button addNewBtn;
+
+    @FXML
+    public TextField searchInput;
 
     @FXML
     private ComboBox<String> sortCombo;
 
     @FXML
     private ComboBox<String> filterCombo;
+
+    @FXML
+    public void onAddNewClicked() throws IOException {
+        util.displayModularScene("/com/kwizera/javaamalitechlabemployeemgtsystem/add_employee.fxml", addNewBtn, "Add a new employee");
+    }
 
     @FXML
     private void initialize() {
