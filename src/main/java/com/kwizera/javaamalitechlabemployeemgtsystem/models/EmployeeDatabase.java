@@ -24,10 +24,16 @@ public class EmployeeDatabase<T> {
         }
     }
 
-    public void removeEmployee(T employeeId) {
+    public boolean removeEmployee(T employeeId) {
+        Employee<T> employeeTodelete = employeeMap.get(employeeId);
         if (employeeMap.remove(employeeId) == null) {
             System.out.println("Employee with " + employeeId + " was not found");
+            return false;
         }
+
+
+        employeesList.remove(employeeTodelete);
+        return true;
     }
 
     public void updateEmployeeDetails(T employeeId, String field, Object newValue) {

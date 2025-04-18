@@ -73,6 +73,11 @@ public class MainPageController {
     }
 
     @FXML
+    void onRemoveClicked() {
+
+    }
+
+    @FXML
     private void initialize() {
         database = instance.getDatabase();
 
@@ -169,6 +174,7 @@ public class MainPageController {
         Label rating = new Label("Rating: " + selectedEmployee.getPerformanceRating());
         Label exp = new Label("Experience: " + selectedEmployee.getYearsOfExperience() + " years");
         Label status = new Label("Status: " + (selectedEmployee.isActive() ? "Active" : "Inactive"));
+        Button removeEmployeeBtn = getRemoveEmployeeBtn(selectedEmployee);
 
         name.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
         dept.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
@@ -177,9 +183,49 @@ public class MainPageController {
         exp.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
         status.setStyle("-fx-font-weight: bold; -fx-font-size: 15;");
 
-        VBox detailsBox = new VBox(10, name, dept, salary, rating, exp, status);
+        VBox detailsBox = new VBox(10, name, dept, salary, rating, exp, status, removeEmployeeBtn);
         detailsBox.setLayoutX(10);
         detailsBox.setLayoutY(10);
         return detailsBox;
     }
+
+    private Button getRemoveEmployeeBtn(Employee<UUID> selectedEmployee) {
+        Button removeEmployeeBtn = new Button("Remove this employee");
+
+        removeEmployeeBtn.setOnAction(event -> {
+            int removedIndex = employeeTable.getSelectionModel().getSelectedIndex();
+
+            Alert alert = new Alert(Alert.AlertType.WARNING,
+                    "Are you sure you want to delete " + selectedEmployee.getName() + "?",
+                    ButtonType.YES, ButtonType.NO);
+            alert.setHeaderText("Confirm Deletion");
+
+            alert.showAndWait().ifPresent(response -> {
+
+                if (response == ButtonType.YES) {
+                    if (database.removeEmployee(selectedEmployee.getEmployeeId())) {
+                        util.displayConfirmation("Employee deleted");
+                        selectNext(removedIndex);
+                        removeEmployeeBtn.setDisable(true);
+                    } else {
+                        util.displayError("Employee not deleted");
+                        removeEmployeeBtn.setDisable(true);
+                    }
+                } else {
+                    removeEmployeeBtn.setDisable(false);
+                }
+            });
+
+        });
+        return removeEmployeeBtn;
+    }
+
+    private void selectNext(int removedIndex) {
+        if (!tableData.isEmpty()) {
+            int nextIndex = Math.min(removedIndex, tableData.size() - 1); // stay in bounds
+            employeeTable.getSelectionModel().select(nextIndex);
+        }
+    }
 }
+
+
