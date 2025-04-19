@@ -25,14 +25,14 @@ public class EmployeeDatabase<T> {
     }
 
     public boolean removeEmployee(T employeeId) {
-        Employee<T> employeeTodelete = employeeMap.get(employeeId);
+        Employee<T> employeeToDelete = employeeMap.get(employeeId);
         if (employeeMap.remove(employeeId) == null) {
             System.out.println("Employee with " + employeeId + " was not found");
             return false;
         }
 
 
-        employeesList.remove(employeeTodelete);
+        employeesList.remove(employeeToDelete);
         return true;
     }
 
@@ -80,7 +80,7 @@ public class EmployeeDatabase<T> {
     public List<Employee<T>> getEmployeeBySearchTerm(String searchTerm) {
         return employeeMap.values()
                 .stream()
-                .filter(e -> e.getName().contains(searchTerm.toLowerCase()))
+                .filter(e -> e.getName().toLowerCase().contains(searchTerm.toLowerCase()))
                 .collect(Collectors.toList());
     }
 
@@ -116,6 +116,15 @@ public class EmployeeDatabase<T> {
                 .values()
                 .stream()
                 .sorted(Comparator.comparingDouble(Employee::getPerformanceRating))
+                .collect(Collectors.toList());
+    }
+
+    // [currently in ascending order, needs to be reversed]
+    public List<Employee<T>> sortByExperience() {
+        return employeeMap
+                .values()
+                .stream()
+                .sorted(Comparator.comparingInt(Employee::getYearsOfExperience))
                 .collect(Collectors.toList());
     }
 
