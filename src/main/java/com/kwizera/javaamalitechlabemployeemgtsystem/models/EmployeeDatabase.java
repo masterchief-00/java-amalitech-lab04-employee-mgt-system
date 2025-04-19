@@ -128,15 +128,19 @@ public class EmployeeDatabase<T> {
                 .collect(Collectors.toList());
     }
 
-    public void giveRaiseToTopPerformers(double thresholdScore, double raiseRate) {
-        employeeMap
+    public long giveRaiseToTopPerformers(double thresholdScore, double raiseRate) {
+        long updateCount = employeeMap
                 .values()
                 .stream()
                 .filter(e -> e.getPerformanceRating() >= thresholdScore)
-                .forEach(e -> {
+                .peek(e -> {
                     double newSalary = e.getSalary() * (1 + raiseRate / 100);
                     e.setSalary(newSalary);
-                });
+                }).count();
+
+        employeesList.setAll(employeeMap.values());
+
+        return updateCount;
     }
 
     public double calculateAverageSalaryByDepartment(String department) {

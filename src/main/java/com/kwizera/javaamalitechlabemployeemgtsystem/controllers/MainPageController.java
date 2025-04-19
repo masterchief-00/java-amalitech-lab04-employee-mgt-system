@@ -22,11 +22,21 @@ import java.util.UUID;
 
 public class MainPageController {
 
+
     SessionManager<UUID> instance = SessionManager.getInstance();
     private EmployeeDatabase<UUID> database;
     Util util = new Util();
 
     DecimalFormat formatter = new DecimalFormat("#,###.00");
+
+    @FXML
+    public Button salaryRaiseBtn;
+
+    @FXML
+    public Button avgSalaryBtn;
+
+    @FXML
+    public Button topEarnersBtn;
 
     @FXML
     public Label noEmployeeLabel;
@@ -68,6 +78,45 @@ public class MainPageController {
     TableColumn<Employee<UUID>, Boolean> statusCol;
 
     private ObservableList<Employee<UUID>> tableData = FXCollections.observableArrayList();
+
+    @FXML
+    private void onAvgSalaryClicked() {
+        Optional<String> result = util.departmentAvgSalaryDialogBox();
+        result.ifPresent(dept -> {
+
+            double avg = database.calculateAverageSalaryByDepartment(dept);
+
+            util.displayConfirmation("The average for the " + dept + " department is " + formatter.format(avg) + " RWF.");
+        });
+    }
+
+    @FXML
+    private void onTopEarnersClicked() {
+        Optional<Integer> result = util.topEarnersDialogBox();
+
+        result.ifPresent(N -> {
+
+            List<Employee<UUID>> list = database.getTopEarners(N);
+
+            tableData.clear();
+            tableData.addAll(list);
+        });
+    }
+
+    @FXML
+    private void onSalaryRaiseClicked() {
+        Optional<Pair<Double, Double>> result = util.salaryRaiseDialogBox();
+        result.ifPresent(pair -> {
+            double minScore = pair.getKey();
+            double increaseScore = pair.getValue();
+
+            long updatedCount = database.giveRaiseToTopPerformers(minScore, increaseScore);
+            List<Employee<UUID>> updatedList = database.getAllEmployees();
+
+            util.displayConfirmation("Salary for " + updatedCount + " employees updated");
+
+        });
+    }
 
     @FXML
     public void onAddNewClicked() throws IOException {

@@ -10,6 +10,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Pair;
 
 import java.io.IOException;
@@ -28,6 +29,12 @@ public class Util {
         stage.initOwner((Stage) sourceButton.getScene().getWindow());
 
         stage.setResizable(false);
+        stage.setOnShown(e -> {
+            Window owner = stage.getOwner();
+            stage.setX(owner.getX() + (owner.getWidth() - stage.getWidth()) / 2);
+            stage.setY(owner.getY() + (owner.getHeight() - stage.getHeight()) / 3);
+        });
+
         stage.show();
     }
 
@@ -39,6 +46,233 @@ public class Util {
         stage.setTitle(title);
         stage.setResizable(false);
         stage.show();
+    }
+
+    public Optional<String> departmentAvgSalaryDialogBox() {
+        Dialog<String> departmentAvgSalaryDialog = new Dialog<>();
+        departmentAvgSalaryDialog.setTitle("Calculate average salary by department");
+        departmentAvgSalaryDialog.setHeaderText("Select department");
+
+        // buttons
+        ButtonType departmentAvgButton = new ButtonType("Get average", ButtonBar.ButtonData.OK_DONE);
+        departmentAvgSalaryDialog.getDialogPane().getButtonTypes().addAll(departmentAvgButton, ButtonType.CANCEL);
+
+        GridPane departmentAvgSalaryDialogGrid = new GridPane();
+        departmentAvgSalaryDialogGrid.setHgap(10);
+        departmentAvgSalaryDialogGrid.setVgap(10);
+        departmentAvgSalaryDialogGrid.setPadding(new Insets(20, 150, 10, 10));
+
+        Label departmentAvgSalaryErrorLabel = new Label("Invalid input, please input valid numbers");
+        departmentAvgSalaryErrorLabel.setStyle("-fx-text-fill: red;");
+        departmentAvgSalaryErrorLabel.setWrapText(true);
+        departmentAvgSalaryErrorLabel.setMinSize(100, 20);
+        departmentAvgSalaryErrorLabel.setVisible(false);
+
+        ComboBox<String> departmentSelectInput = new ComboBox<>();
+        departmentSelectInput.getItems().addAll("Human Resources", "IT", "Finance");
+        departmentSelectInput.setValue("None");
+
+        departmentAvgSalaryDialogGrid.add(new Label("Department: "), 0, 0);
+        departmentAvgSalaryDialogGrid.add(departmentSelectInput, 1, 0);
+        departmentAvgSalaryDialogGrid.add(departmentAvgSalaryErrorLabel, 0, 2, 2, 1);
+
+        departmentAvgSalaryDialog.getDialogPane().setContent(departmentAvgSalaryDialogGrid);
+
+        // input validation
+        Node departmentAvgButtonType = departmentAvgSalaryDialog.getDialogPane().lookupButton(departmentAvgButton);
+        departmentAvgButtonType.setDisable(true);
+
+        ChangeListener<String> validationListener = (observable, oldValue, newValue) -> {
+            String departmentText = departmentSelectInput.getValue();
+
+            if (departmentText.equals("None")) {
+                departmentAvgSalaryErrorLabel.setText("Please select a department");
+                departmentAvgSalaryErrorLabel.setVisible(true);
+                departmentAvgButtonType.setDisable(true);
+            } else {
+                departmentAvgSalaryErrorLabel.setText("");
+                departmentAvgButtonType.setDisable(false);
+            }
+        };
+
+        departmentSelectInput.valueProperty().addListener(validationListener);
+
+        departmentAvgSalaryDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == departmentAvgButton) {
+                return departmentSelectInput.getValue();
+            }
+            return null;
+        });
+
+        return departmentAvgSalaryDialog.showAndWait();
+    }
+
+    public Optional<Integer> topEarnersDialogBox() {
+        Dialog<Integer> topEarnersDialog = new Dialog<>();
+        topEarnersDialog.setTitle("Top earners");
+        topEarnersDialog.setHeaderText("Enter number to retrieve");
+
+        Label topEarnersErrorLabel = new Label("Invalid input, please input valid numbers");
+        topEarnersErrorLabel.setStyle("-fx-text-fill: red;");
+        topEarnersErrorLabel.setWrapText(true);
+        topEarnersErrorLabel.setMinSize(100, 20);
+        topEarnersErrorLabel.setVisible(false);
+
+        // buttons
+        ButtonType topEarnersButtonType = new ButtonType("Filter", ButtonBar.ButtonData.OK_DONE);
+        topEarnersDialog.getDialogPane().getButtonTypes().addAll(topEarnersButtonType, ButtonType.CANCEL);
+
+        GridPane topEarnerGrid = new GridPane();
+        topEarnerGrid.setHgap(10);
+        topEarnerGrid.setVgap(10);
+        topEarnerGrid.setPadding(new Insets(20, 150, 10, 10));
+
+        // N earners input
+        TextField topNEarnersInput = new TextField();
+        topNEarnersInput.setPromptText("Number of earners to retrieve");
+
+        topEarnerGrid.add(new Label("Number to retrieve:"), 0, 0);
+        topEarnerGrid.add(topNEarnersInput, 1, 0);
+        topEarnerGrid.add(topEarnersErrorLabel, 0, 1, 2, 1);
+
+        topEarnersDialog.getDialogPane().setContent(topEarnerGrid);
+
+        // input validation
+        Node topEarnerButton = topEarnersDialog.getDialogPane().lookupButton(topEarnersButtonType);
+        topEarnerButton.setDisable(true);
+
+        ChangeListener<String> validationListener = (observable, oldValue, newValue) -> {
+            String minRatingText = topNEarnersInput.getText();
+
+            try {
+                double minRating = Double.parseDouble(minRatingText);
+
+                if (minRating < 0) {
+                    topEarnersErrorLabel.setText("Please input a number above zero");
+                    topEarnersErrorLabel.setVisible(true);
+                    topEarnerButton.setDisable(true);
+                } else {
+                    topEarnersErrorLabel.setText("");
+                    topEarnerButton.setDisable(false);
+                }
+            } catch (NumberFormatException e) {
+                if (!minRatingText.isEmpty()) {
+                    topEarnersErrorLabel.setText("Invalid numbers");
+                    topEarnersErrorLabel.setVisible(true);
+                } else {
+                    topEarnersErrorLabel.setText("");
+                }
+
+                topEarnerButton.setDisable(true);
+            }
+        };
+
+        topNEarnersInput.textProperty().addListener(validationListener);
+
+        topEarnersDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == topEarnersButtonType) {
+                try {
+                    return Integer.parseInt(topNEarnersInput.getText());
+                } catch (NumberFormatException e) {
+                    topEarnersErrorLabel.setVisible(true);
+                }
+            }
+            return null;
+        });
+
+        return topEarnersDialog.showAndWait();
+    }
+
+    public Optional<Pair<Double, Double>> salaryRaiseDialogBox() {
+        Dialog<Pair<Double, Double>> salaryRaiseDialog = new Dialog<>();
+        salaryRaiseDialog.setTitle("Salary raise");
+        salaryRaiseDialog.setHeaderText("Enter the threshold score and salary increase rate");
+
+        // buttons
+        ButtonType confirmButton = new ButtonType("Confirm", ButtonBar.ButtonData.OK_DONE);
+        salaryRaiseDialog.getDialogPane().getButtonTypes().addAll(confirmButton, ButtonType.CANCEL);
+
+        GridPane salaryRaiseDialogGrid = new GridPane();
+        salaryRaiseDialogGrid.setHgap(10);
+        salaryRaiseDialogGrid.setVgap(10);
+        salaryRaiseDialogGrid.setPadding(new Insets(20, 150, 10, 10));
+
+        // threshold score and salary increase rate inputs
+        TextField thresholdScoreInput = new TextField();
+        thresholdScoreInput.setPromptText("Minimum score");
+
+        TextField increaseRateInput = new TextField();
+        increaseRateInput.setPromptText("Salary increase rate");
+
+        Label salaryRaiseErrorLabel = new Label("Invalid input, please input valid numbers");
+        salaryRaiseErrorLabel.setStyle("-fx-text-fill: red;");
+        salaryRaiseErrorLabel.setWrapText(true);
+        salaryRaiseErrorLabel.setMinSize(100, 20);
+        salaryRaiseErrorLabel.setVisible(false);
+
+        salaryRaiseDialogGrid.add(new Label("Threshold score:"), 0, 0);
+        salaryRaiseDialogGrid.add(thresholdScoreInput, 1, 0);
+        salaryRaiseDialogGrid.add(new Label("Increase rate(%):"), 0, 1);
+        salaryRaiseDialogGrid.add(increaseRateInput, 1, 1);
+        salaryRaiseDialogGrid.add(salaryRaiseErrorLabel, 0, 2, 2, 1);
+
+        salaryRaiseDialog.getDialogPane().setContent(salaryRaiseDialogGrid);
+
+        // input validation
+        Node salaryRaiseConfirmButton = salaryRaiseDialog.getDialogPane().lookupButton(confirmButton);
+        salaryRaiseConfirmButton.setDisable(true);
+
+        ChangeListener<String> validationListener = (observable, oldValue, newValue) -> {
+            String minScore = thresholdScoreInput.getText().trim();
+            String rate = increaseRateInput.getText().trim();
+
+            try {
+                double score = Double.parseDouble(minScore);
+                double increaseBy = Double.parseDouble(rate);
+
+                if (score < 0 || increaseBy < 0) {
+                    salaryRaiseErrorLabel.setText("Negative numbers are not allowed");
+                    salaryRaiseErrorLabel.setVisible(true);
+                    salaryRaiseConfirmButton.setDisable(true);
+                } else if (score > increaseBy) {
+                    salaryRaiseErrorLabel.setText("Minimum salary must be less than maximum salary");
+                    salaryRaiseErrorLabel.setVisible(true);
+                    salaryRaiseConfirmButton.setDisable(true);
+                } else {
+                    salaryRaiseErrorLabel.setText("");
+                    salaryRaiseConfirmButton.setDisable(false);
+                }
+            } catch (NumberFormatException e) {
+                if (!minScore.isEmpty() && !rate.isEmpty()) {
+                    salaryRaiseErrorLabel.setText("Invalid numbers");
+                    salaryRaiseErrorLabel.setVisible(true);
+                } else {
+                    salaryRaiseErrorLabel.setText("");
+                }
+
+                salaryRaiseConfirmButton.setDisable(true);
+            }
+        };
+
+        thresholdScoreInput.textProperty().addListener(validationListener);
+        increaseRateInput.textProperty().addListener(validationListener);
+
+        salaryRaiseDialog.setResultConverter(dialogButton -> {
+            if (dialogButton == confirmButton) {
+                try {
+                    double thresholdScore = Double.parseDouble(thresholdScoreInput.getText());
+                    double increaseRate = Double.parseDouble(increaseRateInput.getText());
+
+                    return new Pair<>(thresholdScore, increaseRate);
+                } catch (NumberFormatException e) {
+                    salaryRaiseErrorLabel.setVisible(true);
+                }
+            }
+            return null;
+        });
+
+        return salaryRaiseDialog.showAndWait();
+
     }
 
     public Optional<String> departmentFilterDialogBox() {
