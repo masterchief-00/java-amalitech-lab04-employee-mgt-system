@@ -69,7 +69,7 @@ public class Util {
         departmentAvgSalaryErrorLabel.setVisible(false);
 
         ComboBox<String> departmentSelectInput = new ComboBox<>();
-        departmentSelectInput.getItems().addAll("Human Resources", "IT", "Finance");
+        departmentSelectInput.getItems().addAll("Engineering", "Marketing", "Sales", "HR");
         departmentSelectInput.setValue("None");
 
         departmentAvgSalaryDialogGrid.add(new Label("Department: "), 0, 0);
@@ -296,7 +296,7 @@ public class Util {
         departmentFilterErrorLabel.setVisible(false);
 
         ComboBox<String> departmentSelectInput = new ComboBox<>();
-        departmentSelectInput.getItems().addAll("Human Resources", "IT", "Finance");
+        departmentSelectInput.getItems().addAll("Engineering", "Marketing", "Sales", "HR");
         departmentSelectInput.setValue("None");
 
         departmentFilterDialogGrid.add(new Label("Department: "), 0, 0);

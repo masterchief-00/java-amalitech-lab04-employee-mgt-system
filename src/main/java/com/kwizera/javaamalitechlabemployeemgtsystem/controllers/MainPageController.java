@@ -3,15 +3,22 @@ package com.kwizera.javaamalitechlabemployeemgtsystem.controllers;
 import com.kwizera.javaamalitechlabemployeemgtsystem.models.Employee;
 import com.kwizera.javaamalitechlabemployeemgtsystem.models.EmployeeDatabase;
 import com.kwizera.javaamalitechlabemployeemgtsystem.session.SessionManager;
+import com.kwizera.javaamalitechlabemployeemgtsystem.utils.InputValidationUtil;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.Util;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.CheckBoxTableCell;
+import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.util.Pair;
+import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -26,6 +33,7 @@ public class MainPageController {
     SessionManager<UUID> instance = SessionManager.getInstance();
     private EmployeeDatabase<UUID> database;
     Util util = new Util();
+    InputValidationUtil inputValidationUtil = new InputValidationUtil();
 
     DecimalFormat formatter = new DecimalFormat("#,###.00");
 
@@ -132,22 +140,25 @@ public class MainPageController {
             return;
         } else {
             tableOperations();
+            updateTableOperations();
         }
     }
 
-    private void tableOperations() {
-        tableData = database.getAllEmployees();
+    private void updateTableOperations() {
 
-        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        departmentCol.setCellValueFactory(new PropertyValueFactory<>("department"));
-        salaryCol.setCellValueFactory(new PropertyValueFactory<>("salary"));
-        ratingCol.setCellValueFactory(new PropertyValueFactory<>("performanceRating"));
-        experienceCol.setCellValueFactory(new PropertyValueFactory<>("yearsOfExperience"));
-        statusCol.setCellValueFactory(new PropertyValueFactory<>("active"));
+        List<String> departments = List.of("Engineering", "Marketing", "Sales", "HR");
+        ObservableList<String> departmentOptions = FXCollections.observableArrayList(departments);
 
-        salaryCol.setCellFactory(col -> new TableCell<Employee<UUID>, Double>() {
+        // defining input components for each column in case of editing
+        nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
+        departmentCol.setCellFactory(ComboBoxTableCell.forTableColumn(departmentOptions));
+        ratingCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        statusCol.setCellFactory(CheckBoxTableCell.forTableColumn(statusCol));
+
+        // number formatting for salary
+        salaryCol.setCellFactory(col -> new TextFieldTableCell<Employee<UUID>, Double>(new DoubleStringConverter()) {
             @Override
-            protected void updateItem(Double item, boolean empty) {
+            public void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
@@ -157,9 +168,10 @@ public class MainPageController {
             }
         });
 
-        experienceCol.setCellFactory(col -> new TableCell<Employee<UUID>, Integer>() {
+        // adding text formatting to experience column
+        experienceCol.setCellFactory(col -> new TextFieldTableCell<Employee<UUID>, Integer>(new IntegerStringConverter()) {
             @Override
-            protected void updateItem(Integer item, boolean empty) {
+            public void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
@@ -169,17 +181,136 @@ public class MainPageController {
             }
         });
 
-        statusCol.setCellFactory(column -> new TableCell<Employee<UUID>, Boolean>() {
-            @Override
-            protected void updateItem(Boolean item, boolean empty) {
-                super.updateItem(item, empty);
-                if (empty || item == null) {
-                    setText(null);
+        statusCol.setCellValueFactory(cellData -> {
+            Employee<UUID> employee = cellData.getValue();
+            return new SimpleBooleanProperty(employee.isActive());
+        });
+
+        nameCol.setOnEditCommit(event -> {
+            Employee<UUID> emp = event.getRowValue();
+            String newName = event.getNewValue();
+            if (!inputValidationUtil.invalidNames(newName)) {
+                emp.setName(newName);
+                if (database.updateEmployeeDetails(emp.getEmployeeId(), "name", emp)) {
+                    util.displayConfirmation("Employee data updated successfully");
+                    updateEmployeeDetailsPane();
                 } else {
-                    setText(item ? "active" : "inactive");
+                    util.displayError("Error: employee not updated");
+                    emp.setName(event.getOldValue());
                 }
+            } else {
+                util.displayError("Error: Invalid names");
+                emp.setName(event.getOldValue());
             }
         });
+
+        salaryCol.setOnEditCommit(event -> {
+            Employee<UUID> emp = event.getRowValue();
+            double newSalary = event.getNewValue();
+            if (!inputValidationUtil.invalidSalary(String.valueOf(newSalary))) {
+                emp.setSalary(newSalary);
+                if (database.updateEmployeeDetails(emp.getEmployeeId(), "salary", emp)) {
+                    util.displayConfirmation("Employee data updated successfully");
+                    updateEmployeeDetailsPane();
+                } else {
+                    util.displayError("Error: employee not updated");
+                    emp.setSalary(event.getOldValue());
+                }
+            } else {
+                util.displayError("Error: Invalid value. Employee not updated");
+                emp.setSalary(event.getOldValue());
+            }
+        });
+
+        departmentCol.setOnEditCommit(event -> {
+            Employee<UUID> emp = event.getRowValue();
+            String newDpt = event.getNewValue();
+            if (newDpt != null || !newDpt.equals("None")) {
+                emp.setDepartment(newDpt);
+                if (database.updateEmployeeDetails(emp.getEmployeeId(), "department", emp)) {
+                    util.displayConfirmation("Employee data updated successfully");
+                    updateEmployeeDetailsPane();
+                } else {
+                    util.displayError("Error: employee not updated");
+                    emp.setDepartment(event.getOldValue());
+                }
+            } else {
+                util.displayError("Error: Invalid department. Employee not updated");
+                emp.setDepartment(event.getOldValue());
+            }
+        });
+
+        ratingCol.setOnEditCommit(event -> {
+            Employee<UUID> emp = event.getRowValue();
+            Double newRating = event.getNewValue();
+            if (!inputValidationUtil.invalidRating(String.valueOf(newRating))) {
+                emp.setPerformanceRating(newRating);
+                if (database.updateEmployeeDetails(emp.getEmployeeId(), "performanceRating", emp)) {
+                    util.displayConfirmation("Employee data updated successfully");
+                    updateEmployeeDetailsPane();
+                } else {
+                    util.displayError("Error: employee not updated");
+                    emp.setPerformanceRating(event.getOldValue());
+                }
+            } else {
+                util.displayError("Error: Invalid rating. Employee not updated");
+                emp.setPerformanceRating(event.getOldValue());
+            }
+        });
+
+        experienceCol.setOnEditCommit(event -> {
+            Employee<UUID> emp = event.getRowValue();
+            int newExp = event.getNewValue();
+            if (!inputValidationUtil.invalidExperienceYears(String.valueOf(newExp))) {
+                emp.setYearsOfExperience(newExp);
+                if (database.updateEmployeeDetails(emp.getEmployeeId(), "yearsOfExperience", emp)) {
+                    util.displayConfirmation("Employee data updated successfully");
+                    updateEmployeeDetailsPane();
+                } else {
+                    util.displayError("Error: employee not updated");
+                    emp.setYearsOfExperience(event.getOldValue());
+                }
+            } else {
+                util.displayError("Error: Invalid input. Employee not updated");
+                emp.setYearsOfExperience(event.getOldValue());
+            }
+        });
+
+        statusCol.setCellValueFactory(cellData -> {
+            Employee<UUID> employee = cellData.getValue();
+            SimpleBooleanProperty property = new SimpleBooleanProperty(employee.isActive());
+
+            property.addListener((obs, wasSelected, isNowSelected) -> {
+
+                Alert alert = new Alert(Alert.AlertType.WARNING,
+                        "Are you sure you want to change status of " + employee.getName() + "?",
+                        ButtonType.YES, ButtonType.NO);
+                alert.setHeaderText("Confirm");
+
+                alert.showAndWait().ifPresent(response -> {
+                    if (response == ButtonType.YES) {
+                        employee.setActive(isNowSelected);
+                        util.displayConfirmation("Employee status updated");
+                        updateEmployeeDetailsPane();
+                    }
+                });
+            });
+
+            return property;
+        });
+
+    }
+
+    private void tableOperations() {
+        tableData = database.getAllEmployees();
+
+        // bind columns with the employee class attributes
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        departmentCol.setCellValueFactory(new PropertyValueFactory<>("department"));
+        salaryCol.setCellValueFactory(new PropertyValueFactory<>("salary"));
+        ratingCol.setCellValueFactory(new PropertyValueFactory<>("performanceRating"));
+        experienceCol.setCellValueFactory(new PropertyValueFactory<>("yearsOfExperience"));
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("active"));
 
         // initialize table with all employees
         employeeTable.setItems(tableData);
@@ -232,11 +363,7 @@ public class MainPageController {
         // display employee details by selecting from table
         employeeTable.getSelectionModel().selectedItemProperty().addListener(((obs, oldSelection, selected) -> {
             if (selected != null) {
-                employeeDetailsPane.getChildren().clear();
-
-                VBox detailsBox = getDetailsBox(selected);
-
-                employeeDetailsPane.getChildren().add(detailsBox);
+                updateEmployeeDetailsPane();
             }
         }));
 
@@ -331,6 +458,18 @@ public class MainPageController {
             employeeTable.getSelectionModel().select(nextIndex);
         }
     }
+
+    private void updateEmployeeDetailsPane() {
+        Employee<UUID> selected = employeeTable.getSelectionModel().getSelectedItem();
+        if (selected != null) {
+            employeeDetailsPane.getChildren().clear();
+
+            VBox detailsBox = getDetailsBox(selected);
+
+            employeeDetailsPane.getChildren().add(detailsBox);
+        }
+    }
+
 }
 
 
