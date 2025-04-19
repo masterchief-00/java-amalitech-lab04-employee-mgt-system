@@ -36,12 +36,12 @@ public class EmployeeDatabase<T> {
         return true;
     }
 
-    public void updateEmployeeDetails(T employeeId, String field, Object newValue) {
+    public boolean updateEmployeeDetails(T employeeId, String field, Object newValue) {
         Employee<T> employee = employeeMap.get(employeeId);
 
         if (employee == null) {
             System.out.println("Employee with " + employeeId + " was not found");
-            return;
+            return false;
         }
 
         switch (field) {
@@ -63,7 +63,11 @@ public class EmployeeDatabase<T> {
             case "isActive":
                 if (newValue instanceof Boolean) employee.setActive((Boolean) newValue);
                 break;
+            default:
+                return false;
         }
+
+        return true;
     }
 
     public ObservableList<Employee<T>> getAllEmployees() {

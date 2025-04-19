@@ -3,6 +3,7 @@ package com.kwizera.javaamalitechlabemployeemgtsystem.controllers;
 import com.kwizera.javaamalitechlabemployeemgtsystem.models.Employee;
 import com.kwizera.javaamalitechlabemployeemgtsystem.models.EmployeeDatabase;
 import com.kwizera.javaamalitechlabemployeemgtsystem.session.SessionManager;
+import com.kwizera.javaamalitechlabemployeemgtsystem.utils.InputValidationUtil;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.Util;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -18,6 +19,7 @@ public class AddEmployeePageController {
     SessionManager<UUID> instance = SessionManager.getInstance();
     private EmployeeDatabase<UUID> database;
     Util util = new Util();
+    InputValidationUtil inputValidationUtil = new InputValidationUtil();
 
     @FXML
     public TextField nameInput;
@@ -53,12 +55,12 @@ public class AddEmployeePageController {
         String rating = ratingInput.getText();
         boolean isValid = true;
 
-        if (invalidNames(names)) {
+        if (inputValidationUtil.invalidNames(names)) {
             nameErrorLabel.setText("Invalid names");
             nameErrorLabel.setVisible(true);
             nameInput.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
             isValid = false;
-        } else if (invalidSalary(salary)) {
+        } else if (inputValidationUtil.invalidSalary(salary)) {
             salaryErrorLabel.setText("Invalid number for salary");
             salaryErrorLabel.setVisible(true);
             salaryInput.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
@@ -68,12 +70,12 @@ public class AddEmployeePageController {
             departmentErrorLabel.setVisible(true);
             selectDepartmentInput.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
             isValid = false;
-        } else if (invalidExperienceYears(experience)) {
+        } else if (inputValidationUtil.invalidExperienceYears(experience)) {
             experienceErrorLabel.setText("Invalid input for years of experience");
             experienceErrorLabel.setVisible(true);
             experienceInput.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
             isValid = false;
-        } else if (invalidRating(rating)) {
+        } else if (inputValidationUtil.invalidRating(rating)) {
             ratingErrorLabel.setText("Invalid input for performance rating");
             ratingErrorLabel.setVisible(true);
             ratingInput.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
@@ -116,57 +118,7 @@ public class AddEmployeePageController {
             util.displayError("Database initialization failed, please try again later");
             return;
         } else {
-            selectDepartmentInput.getItems().addAll("Human resources", "IT", "Finance");
-        }
-    }
-
-    // validating names
-    private boolean invalidNames(String names) {
-        return (!names.matches("[A-Za-z ]*") || names.length() < 2);
-    }
-
-    // validating salary input
-    private boolean invalidSalary(String salary) {
-        try {
-            if (salary.isEmpty()) return false;
-
-            double salaryDbl = Double.parseDouble(salary);
-            boolean regexMatch = salary.matches("[0-9]+");
-            boolean aboveZero = salaryDbl > 0;
-
-            return !regexMatch || !aboveZero;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    // validating experience input
-    private boolean invalidExperienceYears(String exp) {
-        try {
-            if (exp.isEmpty()) return false;
-
-            double expDbl = Double.parseDouble(exp);
-            boolean regexMatch = exp.matches("[0-9]{1,2}");
-            boolean notBelowZero = expDbl >= 0;
-
-            return !regexMatch || !notBelowZero;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    // validating for rating input
-    boolean invalidRating(String rate) {
-        try {
-            if (rate.isEmpty()) return false;
-
-            double rateDbl = Double.parseDouble(rate);
-            boolean regexMatch = rate.matches("[0-5]");
-            boolean notBelowZero = rateDbl >= 0;
-
-            return !regexMatch || !notBelowZero;
-        } catch (NumberFormatException e) {
-            return false;
+            selectDepartmentInput.getItems().addAll("Engineering", "Marketing", "Sales", "HR");
         }
     }
 }
