@@ -11,11 +11,13 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import javafx.util.Pair;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class MainPageController {
@@ -73,11 +75,6 @@ public class MainPageController {
     }
 
     @FXML
-    void onRemoveClicked() {
-
-    }
-
-    @FXML
     private void initialize() {
         database = instance.getDatabase();
 
@@ -85,86 +82,145 @@ public class MainPageController {
             util.displayError("Database initialization failed, please try again later");
             return;
         } else {
-
-            tableData = database.getAllEmployees();
-
-            nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-            departmentCol.setCellValueFactory(new PropertyValueFactory<>("department"));
-            salaryCol.setCellValueFactory(new PropertyValueFactory<>("salary"));
-            ratingCol.setCellValueFactory(new PropertyValueFactory<>("performanceRating"));
-            experienceCol.setCellValueFactory(new PropertyValueFactory<>("yearsOfExperience"));
-            statusCol.setCellValueFactory(new PropertyValueFactory<>("active"));
-
-            salaryCol.setCellFactory(col -> new TableCell<Employee<UUID>, Double>() {
-                @Override
-                protected void updateItem(Double item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(formatter.format(item));
-                    }
-                }
-            });
-
-            experienceCol.setCellFactory(col -> new TableCell<Employee<UUID>, Integer>() {
-                @Override
-                protected void updateItem(Integer item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item + " years");
-                    }
-                }
-            });
-
-            statusCol.setCellFactory(column -> new TableCell<Employee<UUID>, Boolean>() {
-                @Override
-                protected void updateItem(Boolean item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                    } else {
-                        setText(item ? "active" : "inactive");
-                    }
-                }
-            });
-
-            employeeTable.setItems(tableData);
-
-            sortCombo.getItems().addAll("Experience", "Salary", "Performance rating");
-            filterCombo.getItems().addAll("Performance", "Department", "Salary range");
-
-            filterCombo.setOnAction(event -> {
-                String selectedFilter = filterCombo.getValue();
-
-                switch (selectedFilter) {
-                    case "Salary range":
-                        util.salaryRangeDialogBox();
-                        break;
-                    case "Performance":
-                        util.performanceRatingDialogBox();
-                        break;
-                    case "Department":
-                        util.departmentFilterDialogBox();
-                        break;
-                    default:
-                        break;
-                }
-            });
-
-            employeeTable.getSelectionModel().selectedItemProperty().addListener(((obs, oldSelection, selected) -> {
-                if (selected != null) {
-                    employeeDetailsPane.getChildren().clear();
-
-
-                    VBox detailsBox = getDetailsBox(selected);
-
-                    employeeDetailsPane.getChildren().add(detailsBox);
-                }
-            }));
+            tableOperations();
         }
+    }
+
+    private void tableOperations() {
+        tableData = database.getAllEmployees();
+
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        departmentCol.setCellValueFactory(new PropertyValueFactory<>("department"));
+        salaryCol.setCellValueFactory(new PropertyValueFactory<>("salary"));
+        ratingCol.setCellValueFactory(new PropertyValueFactory<>("performanceRating"));
+        experienceCol.setCellValueFactory(new PropertyValueFactory<>("yearsOfExperience"));
+        statusCol.setCellValueFactory(new PropertyValueFactory<>("active"));
+
+        salaryCol.setCellFactory(col -> new TableCell<Employee<UUID>, Double>() {
+            @Override
+            protected void updateItem(Double item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(formatter.format(item));
+                }
+            }
+        });
+
+        experienceCol.setCellFactory(col -> new TableCell<Employee<UUID>, Integer>() {
+            @Override
+            protected void updateItem(Integer item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item + " years");
+                }
+            }
+        });
+
+        statusCol.setCellFactory(column -> new TableCell<Employee<UUID>, Boolean>() {
+            @Override
+            protected void updateItem(Boolean item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item ? "active" : "inactive");
+                }
+            }
+        });
+
+        // initialize table with all employees
+        employeeTable.setItems(tableData);
+
+        // create filter and sort drop down menus
+        sortCombo.getItems().addAll("Experience", "Salary", "Performance");
+        filterCombo.getItems().addAll("Performance", "Department", "Salary range");
+
+        // define actions on filter selections
+        filterCombo.setOnAction(event -> {
+            String selectedFilter = filterCombo.getValue();
+
+            switch (selectedFilter) {
+                case "Salary range":
+                    Optional<Pair<Double, Double>> result = util.salaryRangeDialogBox();
+                    result.ifPresent(range -> {
+                        double min = range.getKey();
+                        double max = range.getValue();
+
+                        List<Employee<UUID>> list = database.getEmployeeBySalaryRange(min, max);
+                        tableData.clear();
+                        tableData.addAll(list);
+                    });
+                    break;
+                case "Performance":
+                    Optional<Double> ratingDialogBoxResult = util.performanceRatingDialogBox();
+
+                    ratingDialogBoxResult.ifPresent(rating -> {
+                        double minRating = rating;
+
+                        List<Employee<UUID>> list = database.getEmployeeByPerformanceRating(minRating);
+                        tableData.clear();
+                        tableData.addAll(list);
+                    });
+                    break;
+                case "Department":
+                    Optional<String> deptDialogResult = util.departmentFilterDialogBox();
+
+                    deptDialogResult.ifPresent(department -> {
+                        List<Employee<UUID>> list = database.getEmployeesByDepartment(department);
+                        tableData.clear();
+                        tableData.addAll(list);
+                    });
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        // display employee details by selecting from table
+        employeeTable.getSelectionModel().selectedItemProperty().addListener(((obs, oldSelection, selected) -> {
+            if (selected != null) {
+                employeeDetailsPane.getChildren().clear();
+
+                VBox detailsBox = getDetailsBox(selected);
+
+                employeeDetailsPane.getChildren().add(detailsBox);
+            }
+        }));
+
+        // real time searching employee by name
+        searchInput.textProperty().addListener((observable, oldValue, newValue) -> {
+            List<Employee<UUID>> result = database.getEmployeeBySearchTerm(newValue);
+
+            tableData.clear();
+            tableData.addAll(result);
+        });
+
+        // define actions on sort operations
+        sortCombo.setOnAction(event -> {
+            String selectedSort = sortCombo.getValue();
+
+            switch (selectedSort) {
+                case "Experience":
+                    List<Employee<UUID>> byExperienceList = database.sortByExperience();
+                    tableData.clear();
+                    tableData.addAll(byExperienceList.reversed());
+                    break;
+                case "Salary":
+                    List<Employee<UUID>> bySalaryList = database.sortBySalary();
+                    tableData.clear();
+                    tableData.addAll(bySalaryList.reversed());
+                    break;
+                case "Performance":
+                    List<Employee<UUID>> byPerformanceList = database.sortByPerformance();
+                    tableData.clear();
+                    tableData.addAll(byPerformanceList.reversed());
+                    break;
+            }
+        });
     }
 
     private VBox getDetailsBox(Employee<UUID> selectedEmployee) {

@@ -41,7 +41,7 @@ public class Util {
         stage.show();
     }
 
-    public void departmentFilterDialogBox() {
+    public Optional<String> departmentFilterDialogBox() {
         Dialog<String> departmentFilterDialog = new Dialog<>();
         departmentFilterDialog.setTitle("Filter by department");
         departmentFilterDialog.setHeaderText("Select department");
@@ -97,15 +97,10 @@ public class Util {
             return null;
         });
 
-        Optional<String> result = departmentFilterDialog.showAndWait();
-
-        result.ifPresent(department -> {
-            // invoke employeedb method
-        });
-
+        return departmentFilterDialog.showAndWait();
     }
 
-    public void performanceRatingDialogBox() {
+    public Optional<Double> performanceRatingDialogBox() {
         Dialog<Double> ratingDialog = new Dialog<>();
         ratingDialog.setTitle("Filter by Performance rating");
         ratingDialog.setHeaderText("Enter minimum rating");
@@ -178,16 +173,10 @@ public class Util {
             return null;
         });
 
-        Optional<Double> ratingDialogBoxResult = ratingDialog.showAndWait();
-
-        ratingDialogBoxResult.ifPresent(rating -> {
-            double minRating = rating;
-
-            // invoke employeedb method
-        });
+        return ratingDialog.showAndWait();
     }
 
-    public void salaryRangeDialogBox() {
+    public Optional<Pair<Double, Double>> salaryRangeDialogBox() {
         Dialog<Pair<Double, Double>> salaryRangeDialog = new Dialog<>();
         salaryRangeDialog.setTitle("Filter by Salary Range");
         salaryRangeDialog.setHeaderText("Enter minimum and maximum salary");
@@ -275,14 +264,8 @@ public class Util {
             return null;
         });
 
-        Optional<Pair<Double, Double>> result = salaryRangeDialog.showAndWait();
+        return salaryRangeDialog.showAndWait();
 
-        result.ifPresent(range -> {
-            double min = range.getKey();
-            double max = range.getValue();
-
-            // invoke employeedb method
-        });
     }
 
     // a utility to render error messages
