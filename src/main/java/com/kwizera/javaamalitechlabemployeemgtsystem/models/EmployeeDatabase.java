@@ -3,6 +3,7 @@ package com.kwizera.javaamalitechlabemployeemgtsystem.models;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -165,5 +166,56 @@ public class EmployeeDatabase<T> {
                 .sorted(Comparator.comparingDouble(Employee::getSalary))
                 .limit(N)
                 .collect(Collectors.toList());
+    }
+
+    public String getReport() {
+        StringBuilder stringBuilder = new StringBuilder();
+        DecimalFormat formatter = new DecimalFormat("#,###.00");
+
+        double totalSpending = employeeMap
+                .values()
+                .stream()
+                .mapToDouble(Employee::getSalary)
+                .sum();
+
+        Map<String, List<Employee<T>>> groupedDepts = employeeMap
+                .values()
+                .stream()
+                .collect(Collectors.groupingBy(Employee::getDepartment));
+
+        stringBuilder.append("==== REPORT SUMMARY ====\n");
+        stringBuilder.append("\nEmployee head count: ").append(employeeMap.size());
+        stringBuilder.append("\nDepartment count: ").append(groupedDepts.size());
+        stringBuilder.append("\nTotal spending: ").append(formatter.format(totalSpending)).append(" RWF\n");
+        stringBuilder.append("\n==== DEPARTMENT SPENDING REPORT ====");
+        for (Map.Entry<String, List<Employee<T>>> entry : groupedDepts.entrySet()) {
+            String dept = entry.getKey();
+            List<Employee<T>> employees = entry.getValue();
+            int headCount = employees.size();
+            double totalSalary = employees
+                    .stream()
+                    .mapToDouble(Employee::getSalary)
+                    .sum();
+
+            stringBuilder.append("\n\nDEPARTMENT: ").append(dept);
+            stringBuilder.append("\n----------------------");
+            stringBuilder.append("\nHead count: ").append(headCount);
+            stringBuilder.append("\nTotal salaries: ").append(formatter.format(totalSalary)).append(" RWF");
+        }
+
+        stringBuilder.append("\n\n==== EXTENSIVE SALARY REPORT ====\n");
+        employeeMap.forEach((key, value) ->
+                stringBuilder.append("\n> ")
+                        .append(value.getName())
+                        .append(" -> ")
+                        .append(formatter.format(value.getSalary()))
+                        .append(" RWF"));
+
+        System.out.println(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+    public void reset() {
+        employeesList.setAll(employeeMap.values());
     }
 }

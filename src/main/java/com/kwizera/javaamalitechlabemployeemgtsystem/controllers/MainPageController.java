@@ -4,7 +4,7 @@ import com.kwizera.javaamalitechlabemployeemgtsystem.models.Employee;
 import com.kwizera.javaamalitechlabemployeemgtsystem.models.EmployeeDatabase;
 import com.kwizera.javaamalitechlabemployeemgtsystem.session.SessionManager;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.InputValidationUtil;
-import com.kwizera.javaamalitechlabemployeemgtsystem.utils.Util;
+import com.kwizera.javaamalitechlabemployeemgtsystem.utils.MainUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -22,7 +22,6 @@ import javafx.util.converter.IntegerStringConverter;
 
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -32,13 +31,19 @@ public class MainPageController {
 
     SessionManager<UUID> instance = SessionManager.getInstance();
     private EmployeeDatabase<UUID> database;
-    Util util = new Util();
+    MainUtil util = new MainUtil();
     InputValidationUtil inputValidationUtil = new InputValidationUtil();
 
     DecimalFormat formatter = new DecimalFormat("#,###.00");
 
     @FXML
     public Button salaryRaiseBtn;
+
+    @FXML
+    public Button reportBtn;
+
+    @FXML
+    Button resetBtn;
 
     @FXML
     public Button avgSalaryBtn;
@@ -88,6 +93,16 @@ public class MainPageController {
     private ObservableList<Employee<UUID>> tableData = FXCollections.observableArrayList();
 
     @FXML
+    private void onResetClicked() {
+        database.reset();
+    }
+
+    @FXML
+    private void onConsoleReportClicked() throws IOException {
+        util.displayModularScene("/com/kwizera/javaamalitechlabemployeemgtsystem/report.fxml", reportBtn, "EMS | Report");
+    }
+
+    @FXML
     private void onAvgSalaryClicked() {
         Optional<String> result = util.departmentAvgSalaryDialogBox();
         result.ifPresent(dept -> {
@@ -119,7 +134,6 @@ public class MainPageController {
             double increaseScore = pair.getValue();
 
             long updatedCount = database.giveRaiseToTopPerformers(minScore, increaseScore);
-            List<Employee<UUID>> updatedList = database.getAllEmployees();
 
             util.displayConfirmation("Salary for " + updatedCount + " employees updated");
 
@@ -128,7 +142,7 @@ public class MainPageController {
 
     @FXML
     public void onAddNewClicked() throws IOException {
-        util.displayModularScene("/com/kwizera/javaamalitechlabemployeemgtsystem/add_employee.fxml", addNewBtn, "Add a new employee");
+        util.displayModularScene("/com/kwizera/javaamalitechlabemployeemgtsystem/add_employee.fxml", addNewBtn, "EMS | Add a new employee");
     }
 
     @FXML
@@ -323,6 +337,8 @@ public class MainPageController {
         filterCombo.setOnAction(event -> {
             String selectedFilter = filterCombo.getValue();
 
+            if (selectedFilter == null) return;
+
             switch (selectedFilter) {
                 case "Salary range":
                     Optional<Pair<Double, Double>> result = util.salaryRangeDialogBox();
@@ -379,6 +395,8 @@ public class MainPageController {
         sortCombo.setOnAction(event -> {
             String selectedSort = sortCombo.getValue();
 
+            if (selectedSort == null) return;
+
             switch (selectedSort) {
                 case "Experience":
                     List<Employee<UUID>> byExperienceList = database.sortByExperience();
@@ -394,6 +412,8 @@ public class MainPageController {
                     List<Employee<UUID>> byPerformanceList = database.sortByPerformance();
                     tableData.clear();
                     tableData.addAll(byPerformanceList.reversed());
+                    break;
+                default:
                     break;
             }
         });
