@@ -83,6 +83,22 @@ public class AddEmployeePageController {
             ratingErrorLabel.setVisible(true);
             ratingInput.setStyle("-fx-border-color: red; -fx-border-width: 2px;");
             isValid = false;
+        } else {
+            nameErrorLabel.setVisible(false);
+            nameInput.setStyle("");
+
+            salaryErrorLabel.setVisible(false);
+            salaryInput.setStyle("");
+
+            departmentErrorLabel.setVisible(false);
+            selectDepartmentInput.setStyle("");
+
+            experienceErrorLabel.setVisible(false);
+            experienceInput.setStyle("");
+
+            ratingErrorLabel.setVisible(false);
+            ratingInput.setStyle("");
+
         }
 
         if (!isValid) {

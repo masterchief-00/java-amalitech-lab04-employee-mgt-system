@@ -10,21 +10,21 @@ public class InputValidationUtil {
     // validating salary input
     public boolean invalidSalary(String salary) {
         try {
-            if (salary.isEmpty()) return false;
+            if (salary.isEmpty()) return true;
 
             double salaryDbl = Double.parseDouble(salary);
-            boolean regexMatch = salary.matches("\\d+(\\.\\d+)?");
+            boolean regexMatch = salary.matches("^\\d+(\\.\\d+)?$");
             boolean aboveZero = salaryDbl > 0;
             return !regexMatch || !aboveZero;
         } catch (NumberFormatException e) {
-            return false;
+            return true;
         }
     }
 
     // validating experience input
     public boolean invalidExperienceYears(String exp) {
         try {
-            if (exp.isEmpty()) return false;
+            if (exp.isEmpty()) return true;
 
             double expDbl = Double.parseDouble(exp);
             boolean regexMatch = exp.matches("[0-9]{1,2}");
@@ -32,14 +32,14 @@ public class InputValidationUtil {
 
             return !regexMatch || !notBelowZero;
         } catch (NumberFormatException e) {
-            return false;
+            return true;
         }
     }
 
     // validating for rating input
     public boolean invalidRating(String rate) {
         try {
-            if (rate.isEmpty()) return false;
+            if (rate.isEmpty()) return true;
 
             double rateDbl = Double.parseDouble(rate);
             boolean regexMatch = rate.matches("\\d+(\\.\\d+)?");
@@ -47,7 +47,7 @@ public class InputValidationUtil {
 
             return !regexMatch || !notOutOfRange;
         } catch (NumberFormatException e) {
-            return false;
+            return true;
         }
     }
 }

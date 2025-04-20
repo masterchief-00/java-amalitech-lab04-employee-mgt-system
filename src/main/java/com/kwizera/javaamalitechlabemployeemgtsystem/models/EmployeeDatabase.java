@@ -171,12 +171,12 @@ public class EmployeeDatabase<T> {
 
     // uses the input integer type to limit the list of employees previously sorted by salary
     public List<Employee<T>> getTopEarners(Integer N) {
-        return employeeMap
+        List<Employee<T>> sortedBySalary = employeeMap
                 .values()
                 .stream()
                 .sorted(Comparator.comparingDouble(Employee::getSalary))
-                .limit(N)
-                .collect(Collectors.toList());
+                .toList();
+        return sortedBySalary.reversed().stream().limit(N).toList();
     }
 
     // uses a string builder to create a report. returns strings and prints the report to console.
