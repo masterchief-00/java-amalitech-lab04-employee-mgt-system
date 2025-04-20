@@ -11,7 +11,7 @@ All features are implemented to be accessed via console(some of them) and GUI de
 - Searching employee by name
 - Filtering and sorting by department, salary, performance rating and experience.
 - Generating reports (GUI and console).
-- A "not bad" landing page😊
+- A "not bad" user interface😊
 
 ## Stack
 - Java 21
