@@ -37,3 +37,6 @@ All features are implemented to be accessed via console(some of them) and GUI de
 - Maven adds dependencies automatically
 - Run the `Main` class
 - 👍
+
+## Video explaining the implementation
+https://screenrec.com/share/iqMZF3k7cW
