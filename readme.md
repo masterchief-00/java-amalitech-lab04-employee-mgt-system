@@ -23,6 +23,7 @@ All features are implemented to be accessed via console(some of them) and GUI de
 - `EmployeeDatabase` generic class employs the use of Maps with `employeeMap` as a make-shift database for the program with methods like `addEmployee(Employee<T> employee)` and `removeEmployee(T employeeId)` performing create and delete operations, respectively.
 - Methods such as `getEmployeeBySearchTerm(String searchTerm)` and `sortByPerformance()`  use <b>Stream API</b> to perform searching, filtering and sorting operations.
 - The `sortByExperience()` method implements `Comparators` to sort employees accordingly to their years of experience. 
+- `SessionManager<T>` provides a static instance for the whole program, allowing multiple-page UI implementation.
 
 ## The user interface implementation summary
 - Simple designs
