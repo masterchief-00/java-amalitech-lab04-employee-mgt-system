@@ -31,7 +31,10 @@ public class LandingPageController {
 
     @FXML
     private void initialize() {
+        // creates an employee database instance with type set to UUID
         EmployeeDatabase<UUID> db = new EmployeeDatabase<>();
+
+        // adds the employee database to the application context for global accessibility
         SessionManager<UUID> session = SessionManager.getInstance();
         session.setDatabase(db);
     }

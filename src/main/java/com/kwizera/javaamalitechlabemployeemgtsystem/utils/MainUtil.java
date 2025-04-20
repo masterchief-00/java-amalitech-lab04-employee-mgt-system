@@ -16,8 +16,10 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.util.Optional;
 
+// contains methods to spawn dialog boxes and switch between screens
 public class MainUtil {
 
+    // displays a modular window
     public void displayModularScene(String fxmlFile, Button sourceButton, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();
@@ -38,6 +40,7 @@ public class MainUtil {
         stage.show();
     }
 
+    // switches to a different window
     public void switchScene(String fxmlFile, Button sourceButton, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
         Parent root = loader.load();

@@ -48,6 +48,8 @@ public class AddEmployeePageController {
 
     @FXML
     private void onConfirmClicked() {
+
+        // read data from inputs
         String names = nameInput.getText();
         String salary = salaryInput.getText();
         String department = selectDepartmentInput.getValue();
@@ -55,6 +57,7 @@ public class AddEmployeePageController {
         String rating = ratingInput.getText();
         boolean isValid = true;
 
+        // input validation
         if (inputValidationUtil.invalidNames(names)) {
             nameErrorLabel.setText("Invalid names");
             nameErrorLabel.setVisible(true);
@@ -86,6 +89,7 @@ public class AddEmployeePageController {
             return;
         } else {
             try {
+                // if valid, create employee
                 UUID uuid = UUID.randomUUID();
                 double salaryDbl = Double.parseDouble(salary);
                 int experienceInt = Integer.parseInt(experience);
@@ -106,12 +110,14 @@ public class AddEmployeePageController {
     }
 
     public void onCancelClicked() throws IOException {
+        // closes the window
         Stage stage = (Stage) cancelBtn.getScene().getWindow();
         stage.close();
     }
 
     @FXML
     private void initialize() {
+        // get employee database from session instance
         database = instance.getDatabase();
 
         if (database == null) {

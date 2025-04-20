@@ -19,6 +19,7 @@ public class Employee<T> implements Comparable<Employee<T>> {
         this.active = isActive;
     }
 
+    // customizing default sort to sort by experience
     @Override
     public int compareTo(Employee<T> other) {
         return other.yearsOfExperience - this.yearsOfExperience;
@@ -83,6 +84,7 @@ public class Employee<T> implements Comparable<Employee<T>> {
         this.active = active;
     }
 
+    // customizing toString() for a simple display of employee details
     @Override
     public String toString() {
         return String.format("Employee{id=%s, name=%s, salary=%.2f, department=%s, yearsOfExperience=%d}",

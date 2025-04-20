@@ -8,6 +8,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class Main extends Application {
+    // loads and displays the starting point of the JavaFX UI
     @Override
     public void start(Stage stage) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/kwizera/javaamalitechlabemployeemgtsystem/landing_page.fxml"));
