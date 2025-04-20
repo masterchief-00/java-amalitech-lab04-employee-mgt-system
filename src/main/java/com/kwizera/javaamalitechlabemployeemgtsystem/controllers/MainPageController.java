@@ -28,7 +28,6 @@ import java.util.UUID;
 
 public class MainPageController {
 
-
     SessionManager<UUID> instance = SessionManager.getInstance();
     private EmployeeDatabase<UUID> database;
     MainUtil util = new MainUtil();
@@ -94,33 +93,37 @@ public class MainPageController {
 
     @FXML
     private void onResetClicked() {
+        // resets the table view component to default all employees display
         database.reset();
     }
 
     @FXML
     private void onConsoleReportClicked() throws IOException {
+        // loads and displays report screen
         util.displayModularScene("/com/kwizera/javaamalitechlabemployeemgtsystem/report.fxml", reportBtn, "EMS | Report");
     }
 
     @FXML
     private void onAvgSalaryClicked() {
+        // displays dialog box to collect department input
         Optional<String> result = util.departmentAvgSalaryDialogBox();
         result.ifPresent(dept -> {
-
+            // if the department was provided, use is to calculate average
             double avg = database.calculateAverageSalaryByDepartment(dept);
-
             util.displayConfirmation("The average for the " + dept + " department is " + formatter.format(avg) + " RWF.");
         });
     }
 
     @FXML
     private void onTopEarnersClicked() {
+        // displays dialog box to collect user's input about the number of top earners to retrieve
         Optional<Integer> result = util.topEarnersDialogBox();
 
         result.ifPresent(N -> {
-
+            // if input provided invokes the method from the database instance
             List<Employee<UUID>> list = database.getTopEarners(N);
 
+            // updates the table view
             tableData.clear();
             tableData.addAll(list);
         });
@@ -128,13 +131,18 @@ public class MainPageController {
 
     @FXML
     private void onSalaryRaiseClicked() {
+
+        // dialog box to collect the min salary and max salary inputs
         Optional<Pair<Double, Double>> result = util.salaryRaiseDialogBox();
         result.ifPresent(pair -> {
+            // extracting the inputs from the pair variable
             double minScore = pair.getKey();
             double increaseScore = pair.getValue();
 
+            // if the operations is successful, the method returns the number of records affected
             long updatedCount = database.giveRaiseToTopPerformers(minScore, increaseScore);
 
+            // confirmation pop up
             util.displayConfirmation("Salary for " + updatedCount + " employees updated");
 
         });
@@ -142,6 +150,7 @@ public class MainPageController {
 
     @FXML
     public void onAddNewClicked() throws IOException {
+        // loads and displays add employee UI
         util.displayModularScene("/com/kwizera/javaamalitechlabemployeemgtsystem/add_employee.fxml", addNewBtn, "EMS | Add a new employee");
     }
 
@@ -153,7 +162,7 @@ public class MainPageController {
             util.displayError("Database initialization failed, please try again later");
             return;
         } else {
-            tableData = database.getAllEmployees();
+            tableData = database.getAllEmployees(); // loads and initializes the table with all employees
             setUpTableColumns();
             loadInitialTableData();
             setUpListeners();
@@ -172,6 +181,7 @@ public class MainPageController {
         statusCol.setCellValueFactory(new PropertyValueFactory<>("active"));
     }
 
+    // initializes the table view and the drop-down list controls
     private void loadInitialTableData() {
         // initialize table with all employees
         employeeTable.setItems(tableData);
@@ -181,6 +191,7 @@ public class MainPageController {
         filterCombo.getItems().addAll("Performance", "Department", "Salary range");
     }
 
+    // adds listeners to some inputs to track user interactions
     private void setUpListeners() {
         // define actions on filter selections
         filterCombo.setOnAction(event -> {
@@ -268,6 +279,7 @@ public class MainPageController {
         });
     }
 
+    // adds configurations to table cells to allow direct editing from UI interaction(double clicking)
     private void setTableColumnsForEditing() {
         List<String> departments = List.of("Engineering", "Marketing", "Sales", "HR");
         ObservableList<String> departmentOptions = FXCollections.observableArrayList(departments);
@@ -423,6 +435,7 @@ public class MainPageController {
         });
     }
 
+    // vbox to display details of the selected employee from the table view
     private VBox getDetailsBox(Employee<UUID> selectedEmployee) {
         Label name = new Label("Name: " + selectedEmployee.getName());
         Label dept = new Label("Department: " + selectedEmployee.getDepartment());
@@ -445,6 +458,7 @@ public class MainPageController {
         return detailsBox;
     }
 
+    // creating a remove button and adding method to it that remove an employee
     private Button getRemoveEmployeeBtn(Employee<UUID> selectedEmployee) {
         Button removeEmployeeBtn = new Button("Remove this employee");
 
@@ -476,6 +490,7 @@ public class MainPageController {
         return removeEmployeeBtn;
     }
 
+    // in case an employee was removed, this method selects the next record in the table(if possible)
     private void selectNext(int removedIndex) {
         if (!tableData.isEmpty()) {
             int nextIndex = Math.min(removedIndex, tableData.size() - 1); // stay in bounds
@@ -483,6 +498,7 @@ public class MainPageController {
         }
     }
 
+    // in case there is an update operation refreshes selected employee details
     private void updateEmployeeDetailsPane() {
         Employee<UUID> selected = employeeTable.getSelectionModel().getSelectedItem();
         if (selected != null) {

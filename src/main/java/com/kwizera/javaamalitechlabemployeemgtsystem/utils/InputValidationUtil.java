@@ -1,5 +1,6 @@
 package com.kwizera.javaamalitechlabemployeemgtsystem.utils;
 
+// defines all methods used for input validation
 public class InputValidationUtil {
     // validating names
     public boolean invalidNames(String names) {
