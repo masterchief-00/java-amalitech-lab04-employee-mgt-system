@@ -5,6 +5,8 @@ import com.kwizera.javaamalitechlabemployeemgtsystem.models.EmployeeDatabase;
 import com.kwizera.javaamalitechlabemployeemgtsystem.session.SessionManager;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.InputValidationUtil;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.MainUtil;
+import com.kwizera.javaamalitechlabemployeemgtsystem.utils.SafeDoubleStringConverterUtil;
+import com.kwizera.javaamalitechlabemployeemgtsystem.utils.SafeIntegerStringConverterUtil;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -287,11 +289,11 @@ public class MainPageController {
         // defining input components for each column in case of editing
         nameCol.setCellFactory(TextFieldTableCell.forTableColumn());
         departmentCol.setCellFactory(ComboBoxTableCell.forTableColumn(departmentOptions));
-        ratingCol.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+        ratingCol.setCellFactory(TextFieldTableCell.forTableColumn(new SafeDoubleStringConverterUtil()));
         statusCol.setCellFactory(CheckBoxTableCell.forTableColumn(statusCol));
 
         // number formatting for salary
-        salaryCol.setCellFactory(col -> new TextFieldTableCell<Employee<UUID>, Double>(new DoubleStringConverter()) {
+        salaryCol.setCellFactory(col -> new TextFieldTableCell<Employee<UUID>, Double>(new SafeDoubleStringConverterUtil()) {
             @Override
             public void updateItem(Double item, boolean empty) {
                 super.updateItem(item, empty);
@@ -304,7 +306,7 @@ public class MainPageController {
         });
 
         // adding text formatting to experience column
-        experienceCol.setCellFactory(col -> new TextFieldTableCell<Employee<UUID>, Integer>(new IntegerStringConverter()) {
+        experienceCol.setCellFactory(col -> new TextFieldTableCell<Employee<UUID>, Integer>(new SafeIntegerStringConverterUtil()) {
             @Override
             public void updateItem(Integer item, boolean empty) {
                 super.updateItem(item, empty);
@@ -341,7 +343,14 @@ public class MainPageController {
 
         salaryCol.setOnEditCommit(event -> {
             Employee<UUID> emp = event.getRowValue();
-            double newSalary = event.getNewValue();
+            Double newSalary = event.getNewValue();
+
+            if (newSalary == null) {
+                util.displayError("Error: Invalid value. Employee not updated");
+                emp.setSalary(event.getOldValue());
+                return;
+            }
+
             if (!inputValidationUtil.invalidSalary(String.valueOf(newSalary))) {
                 emp.setSalary(newSalary);
                 if (database.updateEmployeeDetails(emp.getEmployeeId(), "salary", emp)) {
@@ -377,7 +386,15 @@ public class MainPageController {
 
         ratingCol.setOnEditCommit(event -> {
             Employee<UUID> emp = event.getRowValue();
+
             Double newRating = event.getNewValue();
+
+            if (newRating == null) {
+                util.displayError("Error: Invalid rating. Employee not updated");
+                emp.setPerformanceRating(event.getOldValue());
+                return;
+            }
+
             if (!inputValidationUtil.invalidRating(String.valueOf(newRating))) {
                 emp.setPerformanceRating(newRating);
                 if (database.updateEmployeeDetails(emp.getEmployeeId(), "performanceRating", emp)) {
@@ -395,7 +412,15 @@ public class MainPageController {
 
         experienceCol.setOnEditCommit(event -> {
             Employee<UUID> emp = event.getRowValue();
-            int newExp = event.getNewValue();
+
+            Integer newExp = event.getNewValue();
+
+            if (newExp == null) {
+                util.displayError("Error: Invalid input. Employee not updated");
+                emp.setYearsOfExperience(event.getOldValue());
+                return;
+            }
+
             if (!inputValidationUtil.invalidExperienceYears(String.valueOf(newExp))) {
                 emp.setYearsOfExperience(newExp);
                 if (database.updateEmployeeDetails(emp.getEmployeeId(), "yearsOfExperience", emp)) {
@@ -409,6 +434,7 @@ public class MainPageController {
                 util.displayError("Error: Invalid input. Employee not updated");
                 emp.setYearsOfExperience(event.getOldValue());
             }
+
         });
 
         statusCol.setCellValueFactory(cellData -> {
