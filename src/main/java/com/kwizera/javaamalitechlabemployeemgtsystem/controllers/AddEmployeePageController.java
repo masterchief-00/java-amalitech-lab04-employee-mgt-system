@@ -4,7 +4,7 @@ import com.kwizera.javaamalitechlabemployeemgtsystem.models.Employee;
 import com.kwizera.javaamalitechlabemployeemgtsystem.models.EmployeeDatabase;
 import com.kwizera.javaamalitechlabemployeemgtsystem.session.SessionManager;
 import com.kwizera.javaamalitechlabemployeemgtsystem.utils.InputValidationUtil;
-import com.kwizera.javaamalitechlabemployeemgtsystem.utils.Util;
+import com.kwizera.javaamalitechlabemployeemgtsystem.utils.MainUtil;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class AddEmployeePageController {
     SessionManager<UUID> instance = SessionManager.getInstance();
     private EmployeeDatabase<UUID> database;
-    Util util = new Util();
+    MainUtil util = new MainUtil();
     InputValidationUtil inputValidationUtil = new InputValidationUtil();
 
     @FXML

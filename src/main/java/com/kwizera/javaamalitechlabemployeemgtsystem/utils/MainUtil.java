@@ -16,7 +16,7 @@ import javafx.util.Pair;
 import java.io.IOException;
 import java.util.Optional;
 
-public class Util {
+public class MainUtil {
 
     public void displayModularScene(String fxmlFile, Button sourceButton, String title) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlFile));
